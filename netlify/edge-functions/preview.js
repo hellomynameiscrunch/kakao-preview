@@ -1,13 +1,13 @@
 export default async (request, context) => {
-  const NORMAL_IMAGE = 'https://gcdnb.pbrd.co/images/XEoDA3fQj_mx.png';
-  const RARE_IMAGE = 'https://gcdnb.pbrd.co/images/mu8wcXJG_in0.png';
+  const IMAGE_1 = 'https://gcdnb.pbrd.co/images/XEoDA3fQj_mx.png';
+  const IMAGE_2 = 'https://gcdnb.pbrd.co/images/mu8wcXJG_in0.png';
 
-  // 10% 확률로 희귀 미리보기 당첨 (0.1 = 10%)
-  const isRare = Math.random() < 0.1;
+  // Math.random() < 0.5 는 정확히 50% (반반) 확률입니다.
+  const isImage2 = Math.random() < 0.5;
 
-  const selectedImage = isRare ? RARE_IMAGE : NORMAL_IMAGE;
-  const title = isRare ? "🎉 [대박!] 히든 희귀 미리보기가 등장했습니다!" : "📢 오픈채팅방 공지사항 링크";
-  const description = isRare ? "이 미리보기를 캡처해서 인증하시면 특별 보상을 드립니다!" : "터치하여 공지 내용 및 웹사이트를 확인하세요.";
+  const selectedImage = isImage2 ? IMAGE_2 : IMAGE_1;
+  const title = isImage2 ? "🔴 [타입 B] 미리보기" : "🔵 [타입 A] 미리보기";
+  const description = isImage2 ? "희귀/특수 이미지가 걸렸습니다!" : "일반 이미지가 걸렸습니다!";
 
   const html = `
   <!DOCTYPE html>
@@ -16,7 +16,7 @@ export default async (request, context) => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
-      <!-- 카카오톡 미리보기(OG) 설정 -->
+      <!-- 카카오톡 Open Graph 메타 태그 -->
       <meta property="og:type" content="website">
       <meta property="og:title" content="${title}">
       <meta property="og:description" content="${description}">
@@ -30,10 +30,27 @@ export default async (request, context) => {
           body { font-family: sans-serif; text-align: center; padding: 50px 20px; background-color: #f9f9f9; }
           .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; max-width: 500px; width: 100%; }
           img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 15px; }
-          .badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; }
-          .rare { background: #ffeaa7; color: #d63031; }
-          .normal { background: #dfe6e9; color: #2d3436; }
       </style>
+  </head>
+  <body>
+      <div class="card">
+          <h1>${title}</h1>
+          <p>${description}</p>
+          <img src="${selectedImage}" alt="미리보기 이미지">
+      </div>
+  </body>
+  </html>
+  `;
+
+  return new Response(html, {
+    headers: {
+      "content-type": "text/html; charset=UTF-8",
+      // 서버 및 CDN 캐시 완전 차단
+      "cache-control": "no-cache, no-store, must-revalidate, max-age=0",
+      "netlify-cdn-cache-control": "no-store",
+    },
+  });
+};
   </head>
   <body>
       <div class="card">
